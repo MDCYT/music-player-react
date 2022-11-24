@@ -16,7 +16,7 @@ function App() {
           <div className="flex flex-row gap-32">
             <i className="fas fa-list text-[#991367] text-4xl"></i>
             <i className="fa-regular fa-heart text-[#991367] text-4xl"></i>
-            <i className="fas fa-share text-[#991367] text-4xl"></i>
+            <i className="fas fa-chart-simple text-[#991367] text-4xl opacity-50" id="visualizerButton"></i>
           </div>
         </div>
         {/* Make a div for a song title */}

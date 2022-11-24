@@ -9,7 +9,6 @@ window.addEventListener('DOMContentLoaded', async (event) => {
 
     const img = new Image();
     img.src = '/img/zim.png';
-    // wait for change the image
 
     let updateTime = () => {};
     let updateTitleAndArtist = () => {};
@@ -73,7 +72,6 @@ window.addEventListener('DOMContentLoaded', async (event) => {
 
     progressBar.addEventListener('change', () => {
         audio.currentTime = progressBar.value;
-        renderFrame();
         if(!repeat.classList.contains('active') && Math.floor(audio.currentTime) === Math.floor(audio.duration)) {
             play.classList.add('paused');
             play.classList.add('fa-play');
@@ -114,61 +112,115 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     canvas.width = img.width;
     canvas.height = img.height;
 
-    //Make a music visualizer
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const analyser = audioCtx.createAnalyser();
-    const source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    analyser.fftSize = 128;
+    // Make the same code but with with a button for activate the visualizer or not
+    const visualizerButton = document.getElementById("visualizerButton");
+    let visualizerIsActive = false;
 
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    visualizerButton.addEventListener('click', () => {
+        if(visualizerIsActive) {
+            visualizerIsActive = false;
+            visualizerButton.classList.remove('active');
+            visualizerButton.classList.remove('opacity-100');
+            visualizerButton.classList.add('opacity-50');
+        } else {
+            visualizerIsActive = true;
+            visualizerButton.classList.add('active');
+            visualizerButton.classList.add('opacity-100');
+            visualizerButton.classList.remove('opacity-50');
+        }
+    });
 
-    const WIDTH = canvas.width
-    const HEIGHT = canvas.height
+    visualizerButton.addEventListener('mouseover', () => {
+        visualizerButton.style.cursor = 'pointer';
+        visualizerButton.style.transform = 'scale(1.1)';
+        visualizerButton.classList.add('hover');
+    });
 
-    const barWidth = (WIDTH / bufferLength) * 2;
-    let barHeight;
-    let x = 0;
+    visualizerButton.addEventListener('mouseout', () => {
+        visualizerButton.style.cursor = 'default';
+        visualizerButton.style.transform ='scale(1)';
+        visualizerButton.classList.remove('hover')
+    });
 
-    ctx.imageSmoothingEnabled = false;
+    let visualizer;
 
-    function renderFrame() {
-        requestAnimationFrame(renderFrame);
+    //Make a music visualizer, only create if the button is clicked, and destroy if the button is clicked again
+    visualizerButton.addEventListener('click', () => {
+        if(visualizer) {
+            if(visualizerIsActive) {
+                visualizer.isActivated = true;
+            } else {
+                visualizer.isActivated = false;
+            }
 
-        x = 0;
+        } else {
+            visualizer = new Visualizer();
+        }
+    });
 
-        analyser.getByteFrequencyData(dataArray);
+    class Visualizer {
+        constructor() {
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioCtx.createAnalyser();
+            this.source = this.audioCtx.createMediaElementSource(audio);
+            this.source.connect(this.analyser);
+            this.analyser.connect(this.audioCtx.destination);
+            this.analyser.fftSize = 128;
 
-        ctx.clearRect(0,0,WIDTH,HEIGHT);
+            this.bufferLength = this.analyser.frequencyBinCount;
+            this.dataArray = new Uint8Array(this.bufferLength);
 
+            this.WIDTH = canvas.width
+            this.HEIGHT = canvas.height
 
-        for(let i = 0; i < bufferLength; i++) {
-            barHeight = dataArray[i] * 8;
+            this.barWidth = (this.WIDTH / this.bufferLength) * 2;
+            this.x = 0;
 
-            // const r = barHeight + (25 * (i/bufferLength));
-            // const g = 250 * (i/bufferLength);
-            // const b = 50;
+            this.isActivated = true;
 
-            // Make a rgb, if is a big number, the color is magenta, if is a small number, the color is pink, the colors is in a degradado
-            const r = 255;
-            const g = 0;
-            const b = 255 - (255 * (i/bufferLength));
+            ctx.imageSmoothingEnabled = false;
 
-            ctx.fillStyle = `rgb(${r}, ${g}, ${b}, 0.2)`;
-            ctx.fillRect(x, (HEIGHT - barHeight), barWidth, barHeight);
-
-            x += barWidth + 1;
-
-            // Put the image in the canvas
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-            
+            this.renderFrame();
         }
 
+        renderFrame() {
+            requestAnimationFrame(this.renderFrame.bind(this));
+
+            this.x = 0;
+
+            this.analyser.getByteFrequencyData(this.dataArray);
+
+            ctx.clearRect(0,0,this.WIDTH,this.HEIGHT);
+
+
+            for(let i = 0; i < this.bufferLength; i++) {
+
+                if(this.isActivated){
+                    this.barHeight = this.dataArray[i] * 8;
+
+                    // const r = barHeight + (25 * (i/bufferLength));
+                    // const g = 250 * (i/bufferLength);
+                    // const b = 50;
+    
+                    // Make a rgb, if is a big number, the color is magenta, if is a small number, the color is pink, the colors is in a degradado
+                    const r = 255;
+                    const g = 0;
+                    const b = 255 - (255 * (i/this.bufferLength));
+    
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b}, 0.2)`;
+                    ctx.fillRect(this.x, (this.HEIGHT - this.barHeight), this.barWidth, this.barHeight);
+    
+                    this.x += this.barWidth + 1;
+    
+                    // Put the image in the canvas
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                } else {
+                    ctx.clearRect(0,0,this.WIDTH,this.HEIGHT);
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                }
+            }
+
+        }
     }
 
-    renderFrame();
-
-    
 });
