@@ -134,16 +134,16 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     ctx.imageSmoothingEnabled = false;
 
     function renderFrame() {
+        ctx.clearRect(0,0,WIDTH,HEIGHT);
+
         requestAnimationFrame(renderFrame);
 
         x = 0;
 
         analyser.getByteFrequencyData(dataArray);
 
-        ctx.clearRect(0,0,WIDTH,HEIGHT);
-
-
         for(let i = 0; i < bufferLength; i++) {
+            
             barHeight = dataArray[i] * 8;
 
             // const r = barHeight + (25 * (i/bufferLength));
