@@ -22,44 +22,41 @@ window.addEventListener('DOMContentLoaded', async (event) => {
 
     let isChangingTime = false;
 
-    let updateTime = () => { };
-    let updateTitleAndArtist = () => { };
-    audio.onloadedmetadata = async function () {
-        updateTime = (currentTime) => {
-            let min = Math.floor(currentTime / 60)
-            let sec = Math.floor(currentTime % 60)
-            let allTime = Math.floor(audio.duration);
-            let allMin = Math.floor(allTime / 60);
-            let allSec = Math.floor(allTime % 60);
-            if (sec < 10) {
-                sec = `0${sec}`;
-            }
-            time.innerText = `${min}:${sec} / ${allMin}:${allSec}`;
-            if (!isChangingTime) {
-                progressBar.value = (currentTime / audio.duration) * 100;
-            }
-            //Chnage the max value of the progress bar
-            progressBar.maxLength = audio.duration;
-
-            if (!repeat.classList.contains('paused') && audio.currentTime === audio.duration) {
-                play.classList.add('paused');
-                play.classList.add('fa-play');
-                play.classList.remove('fa-pause');
-                audio.pause();
-                //Move the audio to the start
-                audio.currentTime = 0;
-            }
+    let updateTime = () => updateTime = (currentTime) => {
+        let min = Math.floor(currentTime / 60)
+        let sec = Math.floor(currentTime % 60)
+        let allTime = Math.floor(audio.duration);
+        let allMin = Math.floor(allTime / 60);
+        let allSec = Math.floor(allTime % 60);
+        if (sec < 10) {
+            sec = `0${sec}`;
         }
-
-        updateTime(audio.currentTime);
-
-        updateTitleAndArtist = () => {
-            let titleAndArtist = audio.title.split(' - ');
-            title.innerText = titleAndArtist[0];
-            author.innerText = titleAndArtist[1];
+        time.innerText = `${min}:${sec} / ${allMin}:${allSec}`;
+        if (!isChangingTime) {
+            progressBar.value = (currentTime / audio.duration) * 100;
         }
+        //Chnage the max value of the progress bar
+        progressBar.maxLength = audio.duration;
 
+        if (!repeat.classList.contains('paused') && audio.currentTime === audio.duration) {
+            play.classList.add('paused');
+            play.classList.add('fa-play');
+            play.classList.remove('fa-pause');
+            audio.pause();
+            //Move the audio to the start
+            audio.currentTime = 0;
+        }
         updateTitleAndArtist();
+    }
+
+    let updateTitleAndArtist = () => {
+        let titleAndArtist = audio.title.split(' - ');
+        title.innerText = titleAndArtist[0];
+        author.innerText = titleAndArtist[1];
+    };
+
+    audio.onloadedmetadata = async function () {
+        updateTime(audio.currentTime);
     }
 
     function playOrPause() {
