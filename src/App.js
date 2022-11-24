@@ -1,6 +1,4 @@
 import './App.css';
-// Add a function for the play or pause button
-import './js/player.js';
 
 function App() {  
 
@@ -35,7 +33,7 @@ function App() {
         </div>
         {/* Make a div for the time of the song */}
         <div className="flex flex-row justify-center w-96">
-          <div className="text-[#991367] text-xl time-song">0:00 / 0:00</div>
+          <div className="text-[#991367] text-xl" id="time-song">0:00 / 0:00</div>
         </div>
         {/* Make a div for the buttons of the music player, the buttons are font awesome icons and is, list, like and share */}
         <div className="flex flex-row justify-center w-96 my-4">

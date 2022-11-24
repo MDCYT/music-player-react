@@ -5,10 +5,11 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const progressBar = document.getElementById('progressBar');
     const title = document.getElementById('titleSong');
     const author = document.getElementById('authorSong');
+    const time = document.getElementById("time-song")
+
     const img = new Image();
     img.src = '/img/zim.png';
     // wait for change the image
-    const time = document.querySelector('.time-song');
 
     let updateTime = () => {};
     let updateTitleAndArtist = () => {};
